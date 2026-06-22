@@ -3,14 +3,18 @@ from application.main import app
 client=TestClient(app)
 def test_register():
     response=client.post("/auth/register",json={
-        "email":"test@mail.com",
+        "email":"register@mail.com",
         "password":"qwerty123"
     })
     assert response.status_code==201
-    assert response.json()["email"]=="test@mail.com"
+    assert response.json()["email"]=="register@mail.com"
 def test_login_success():
-    response=client.post("/auth/login",json={
-        "email":"test@mail.com",
+    client.post("/auth/register",json={
+        "email":"success@mail.com",
+        "password":"qwerty123"
+    })
+    response=client.post("/auth/login",data={
+        "username":"success@mail.com",
         "password":"qwerty123"
     })
     assert response.status_code==200
@@ -27,11 +31,11 @@ def test_register_duplicate_email():
     assert response.status_code==400
 def test_login_wrong_password():
     client.post("/auth.register",json={
-        "email":"email@mail.com",
+        "email":"wrong@mail.com",
         "password":"wrong123"
     })
-    response=client.post("/auth/login",json={
-        "email":"email@mail.com",
+    response=client.post("/auth/login",data={
+        "username":"wrong@mail.com",
         "password":"wrong1234"
     })
-    assert response.status_code==401
+    assert response.status_code==400
